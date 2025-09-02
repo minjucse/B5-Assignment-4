@@ -5,7 +5,6 @@ import {
   useUpdateBookMutation,
   useDeleteBookMutation
 } from '@/redux/features/books/booksApi';
-import { useBorrowBookMutation } from '@/redux/features/borrow/borrowApi';
 import type { Book } from '@/types';
 import BookForm, { BookFormValues } from '@/components/modules/books/BookForm';
 import BorrowBookForm from "@/components/modules/borrow/BorrowBookForm"
@@ -20,7 +19,6 @@ export default function BooksPage() {
   const [addBook, { isLoading: creating }] = useAddBookMutation();
   const [updateBook, { isLoading: updating }] = useUpdateBookMutation();
   const [deleteBook, { isLoading: deleting }] = useDeleteBookMutation();
-  const [borrowBook, { isLoading: borrowing }] = useBorrowBookMutation();
 
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<'title' | 'author' | 'copies'>('title');
@@ -41,7 +39,7 @@ export default function BooksPage() {
   const handleCreate = async (v: BookFormValues): Promise<{ success: boolean; message: string }> => {
     try {
       if (v.copies === 0) v.available = false
-      const book = await addBook(v).unwrap()
+      await addBook(v).unwrap()
       return { success: true, message: "Book created successfully" }
     } catch (err: any) {
       return { success: false, message: err?.data?.message || "Failed to create book" }
@@ -52,7 +50,7 @@ export default function BooksPage() {
     if (!editBook) return { success: false, message: "No book selected" }
     try {
       if (v.copies === 0) v.available = false
-      const book = await updateBook({ id: editBook._id, data: v }).unwrap()
+       await updateBook({ id: editBook._id, data: v }).unwrap()
       return { success: true, message: "Book updated successfully" }
     } catch (err: any) {
       return { success: false, message: err?.data?.message || "Failed to update book" }
@@ -64,18 +62,7 @@ export default function BooksPage() {
     if (confirm('Delete this book?')) await deleteBook(id).unwrap();
   };
 
-  const handleBorrow = async (id: string) => {
-    setBorrowBookId(id);
-  };
-
-  const submitBorrow = async (copies: number) => {
-    if (!borrowBookId) return;
-    const book = books.find((b) => b._id === borrowBookId);
-    if (!book) return;
-    const updatedCopies = book.copies - copies;
-    await updateBook({ id: borrowBookId, data: { ...book, copies: updatedCopies, available: updatedCopies > 0 } }).unwrap();
-    setBorrowBookId(null);
-  };
+ 
 
   const handleEditClick = (book: Book) => {
     setEditBook(book);
@@ -172,7 +159,7 @@ export default function BooksPage() {
           onOpenChange={(open) => setBorrowBookId(open ? b._id : null)}
         >
           <DialogTrigger asChild>
-            <Button size="sm" disabled={b.copies <= 0 || borrowing}>
+            <Button size="sm">
               Borrow
             </Button>
           </DialogTrigger>

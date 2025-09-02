@@ -6,11 +6,6 @@ export default function BorrowSummary() {
   if (isLoading) return <p>Loading summary...</p>;
   if (isError) return <p>Failed to load summary</p>;
 
-  const total = data?.data?.reduce(
-    (sum: number, item: any) => sum + item.totalQuantity,
-    0
-  );
-
   return (
     <div className="p-6">
       <h1 className="text-xl font-bold mb-4">Borrow Summary</h1>

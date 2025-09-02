@@ -8,20 +8,26 @@ export default function CreateBookPage() {
   const [createBook, { isLoading }] = useAddBookMutation();
 
   const handleSubmit = async (values: BookFormValues) => {
-    // Ensure backend format
-    const payload = {
-      title: values.title,
-      author: values.author,
-      genre: values.genre,
-      isbn: values.isbn,
-      description: values.description,
-      copies: values.copies,
-      available: values.available ?? true,
-    };
+    try {
+      const payload = {
+        title: values.title,
+        author: values.author,
+        genre: values.genre,
+        isbn: values.isbn,
+        description: values.description,
+        copies: values.copies,
+        available: values.available ?? true,
+      };
 
-    await createBook(payload).unwrap();
-    navigate("/books"); // redirect after creation
+      await createBook(payload).unwrap();
+      navigate("/books");
+      return { success: true, message: "Book created successfully!" };
+
+    } catch (err: any) {
+      return { success: false, message: err?.data?.message || "Failed to create book." };
+    }
   };
+
 
   return (
     <Card className="max-w-lg mx-auto mt-8">
