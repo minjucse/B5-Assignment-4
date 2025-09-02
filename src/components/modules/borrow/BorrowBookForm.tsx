@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
+import { toast } from "sonner"
 interface BorrowFormProps {
   bookId: string;
   maxQuantity: number;
@@ -21,7 +21,7 @@ export default function BorrowBookForm({ bookId, maxQuantity }: BorrowFormProps)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (quantity < 1 || quantity > maxQuantity)
-      return alert(`Quantity must be between 1 and ${maxQuantity}`);
+      return toast.error(`Quantity must be between 1 and ${maxQuantity}`);
 
     // Correct payload for backend
     const payload = {
@@ -32,10 +32,10 @@ export default function BorrowBookForm({ bookId, maxQuantity }: BorrowFormProps)
 
     try {
       await borrowBook(payload).unwrap();
-      alert("Book borrowed successfully!");
-      navigate("/summary");
+      toast.success("Book borrowed successfully!");
+      navigate("/borrow-summary");
     } catch (err: any) {
-      alert(err?.data?.message || "Failed to borrow book.");
+      toast.error(err?.data?.message || "Failed to borrow book.");
     }
   };
 

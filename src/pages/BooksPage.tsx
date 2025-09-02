@@ -50,19 +50,16 @@ export default function BooksPage() {
     if (!editBook) return { success: false, message: "No book selected" }
     try {
       if (v.copies === 0) v.available = false
-       await updateBook({ id: editBook._id, data: v }).unwrap()
+      await updateBook({ id: editBook._id, data: v }).unwrap();
       return { success: true, message: "Book updated successfully" }
     } catch (err: any) {
       return { success: false, message: err?.data?.message || "Failed to update book" }
     }
   }
 
-
   const handleDelete = async (id: string) => {
     if (confirm('Delete this book?')) await deleteBook(id).unwrap();
   };
-
- 
 
   const handleEditClick = (book: Book) => {
     setEditBook(book);
@@ -128,52 +125,52 @@ export default function BooksPage() {
             </TableHeader>
 
             <TableBody>
-  {filtered.map((b) => (
-    <TableRow key={b._id}>
-      <TableCell>{b.title}</TableCell>
-      <TableCell>{b.author}</TableCell>
-      <TableCell>{b.genre}</TableCell>
-      <TableCell>{b.isbn}</TableCell>
-      <TableCell className="text-right">{b.copies}</TableCell>
-      <TableCell>{b.available ? "Yes" : "No"}</TableCell>
-      <TableCell className="space-x-2">
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => handleEditClick(b)}
-        >
-          Edit
-        </Button>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => handleDelete(b._id)}
-          disabled={deleting}
-        >
-          Delete
-        </Button>
+              {filtered.map((b) => (
+                <TableRow key={b._id}>
+                  <TableCell>{b.title}</TableCell>
+                  <TableCell>{b.author}</TableCell>
+                  <TableCell>{b.genre}</TableCell>
+                  <TableCell>{b.isbn}</TableCell>
+                  <TableCell className="text-right">{b.copies}</TableCell>
+                  <TableCell>{b.available ? "Yes" : "No"}</TableCell>
+                  <TableCell className="space-x-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleEditClick(b)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(b._id)}
+                      disabled={deleting}
+                    >
+                      Delete
+                    </Button>
 
-        {/* Borrow Dialog */}
-        <Dialog
-          open={borrowBookId === b._id}
-          onOpenChange={(open) => setBorrowBookId(open ? b._id : null)}
-        >
-          <DialogTrigger asChild>
-            <Button size="sm">
-              Borrow
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[400px]">
-            <DialogHeader>
-              <DialogTitle>Borrow Book</DialogTitle>
-            </DialogHeader>
-            <BorrowBookForm bookId={b._id} maxQuantity={b.copies} />
-          </DialogContent>
-        </Dialog>
-      </TableCell>
-    </TableRow>
-  ))}
-</TableBody>
+                    {/* Borrow Dialog */}
+                    <Dialog
+                      open={borrowBookId === b._id}
+                      onOpenChange={(open) => setBorrowBookId(open ? b._id : null)}
+                    >
+                      <DialogTrigger asChild>
+                        <Button size="sm">
+                          Borrow
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[400px]">
+                        <DialogHeader>
+                          <DialogTitle>Borrow Book</DialogTitle>
+                        </DialogHeader>
+                        <BorrowBookForm bookId={b._id} maxQuantity={b.copies} />
+                      </DialogContent>
+                    </Dialog>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
 
           </Table>
         </CardContent>
