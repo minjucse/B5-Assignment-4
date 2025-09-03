@@ -67,7 +67,7 @@ export default function BooksPage() {
   };
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-6 mt-6  mb-8 max-w-7xl mx-auto">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Books</CardTitle>

@@ -1,4 +1,5 @@
 import App from "@/App";
+import HomePage from "@/pages/HomePage";   // ✅ new page
 import BooksPage from "@/pages/BooksPage";
 import BorrowSummary from "@/pages/BorrowSummary";
 import CreateBookPage from "@/pages/CreateBookPage";
@@ -11,7 +12,7 @@ export const routes = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <BooksPage />,
+        element: <HomePage />,   // ✅ Show HomePage on `/`
       },
       {
         path: "books",
@@ -21,7 +22,7 @@ export const routes = createBrowserRouter([
         path: "create-book",
         element: <CreateBookPage />,
       },
-       {
+      {
         path: "borrow-summary",
         element: <BorrowSummary />,
       },

@@ -13,9 +13,7 @@ function App() {
       </header>
 
       <main className="flex-1 w-full">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <Outlet />
-        </div>
+         <Outlet />
       </main>
 
       <footer className="w-full bg-[#F5F5F3]">

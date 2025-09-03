@@ -7,7 +7,7 @@ export default function BorrowSummary() {
   if (isError) return <p>Failed to load summary</p>;
 
   return (
-    <div className="p-6">
+    <div className="p-6 mt-6  mb-8 max-w-7xl mx-auto">
       <h1 className="text-xl font-bold mb-4">Borrow Summary</h1>
       <table className="w-full border-collapse border">
         <thead>
