@@ -172,10 +172,13 @@ export default function BooksPage() {
                             <DialogHeader>
                               <DialogTitle>Borrow Book: {b.title}</DialogTitle>
                             </DialogHeader>
-                            <BorrowBookForm 
-                              bookId={b._id} 
+                            <BorrowBookForm
+                              bookId={b._id}
                               maxQuantity={b.copies}
-                              onSuccess={() => setBorrowBookId(null)}
+                              onSuccess={() => {
+                                setBorrowBookId(null);
+                                refetch();
+                              }}
                             />
                           </DialogContent>
                         </Dialog>

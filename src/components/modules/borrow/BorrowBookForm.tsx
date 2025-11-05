@@ -18,16 +18,14 @@ export default function BorrowBookForm({ bookId, maxQuantity, onSuccess }: Borro
   const [borrowBook, { isLoading, isSuccess }] = useBorrowBookMutation();
 
   const [quantity, setQuantity] = useState(1);
-  // Set the default value of dueDate to the current date ('today')
   const [dueDate, setDueDate] = useState(today);
 
-  // Auto-close dialog on success
   useEffect(() => {
     if (isSuccess) {
       if (onSuccess) {
         onSuccess();
       }
-      // Reset form (note: reset dueDate to 'today' as well)
+      
       setQuantity(1);
       setDueDate(today); 
     }
@@ -45,10 +43,9 @@ export default function BorrowBookForm({ bookId, maxQuantity, onSuccess }: Borro
       return toast.error("Please select a due date");
     }
 
-    // Check if due date is in the past (This logic remains important for user modification)
+  
     if (new Date(dueDate) < new Date(today)) {
-      // This toast might be unnecessary if the 'min' attribute on the Input is working correctly, 
-      // but it's good as a final client-side safeguard.
+   
       return toast.error("Due date cannot be in the past");
     }
 
@@ -61,9 +58,7 @@ export default function BorrowBookForm({ bookId, maxQuantity, onSuccess }: Borro
     try {
       await borrowBook(payload).unwrap();
       toast.success("Book borrowed successfully!");
-      
-      // Optional: Navigate to borrow summary
-      // navigate("/borrow-summary");
+    
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to borrow book.");
     }
