@@ -1,6 +1,10 @@
 import { baseApi } from '../../baseApi'
 import type { Book } from '../../../types'
-
+interface BooksResponse {
+  success: boolean
+  message: string
+  data: Book[]
+}
 export const booksApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
 
@@ -13,15 +17,15 @@ export const booksApi = baseApi.injectEndpoints({
       invalidatesTags: ["Book"],
     }),
 
-    getBooks: builder.query<Book[], void>({
+     getBooks: builder.query<Book[], void>({
       query: () => ({
         url: "/books",
         method: "GET",
       }),
+      // ✅ unwrap "data" field from API response
+      transformResponse: (response: BooksResponse) => response.data,
       providesTags: ["Book"],
-      transformResponse: (response: { success: boolean; message: string; data: Book[] }) => response.data,
     }),
-
     getBook: builder.query<Book, string>({
       query: (id) => `/books/${id}`,
       providesTags: (_result, _error, id) => [{ type: "Book", id }],
@@ -33,7 +37,7 @@ export const booksApi = baseApi.injectEndpoints({
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: (_result, _error, { id }) => [{ type: "Book", id }],
+      invalidatesTags: ["Book"],
     }),
 
     deleteBook: builder.mutation<{ success: boolean; id: string }, string>({
@@ -41,7 +45,7 @@ export const booksApi = baseApi.injectEndpoints({
         url: `/books/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: (_result, _error, id) => [{ type: "Book", id }],
+        invalidatesTags: ["Book"],
     }),
   }),
 })

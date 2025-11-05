@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function BooksPage() {
-  const { data: books = [], isLoading, isFetching } = useGetBooksQuery();
+  const { data: books = [], isLoading, isFetching, refetch } = useGetBooksQuery();
   const [addBook, { isLoading: creating }] = useAddBookMutation();
   const [updateBook, { isLoading: updating }] = useUpdateBookMutation();
   const [deleteBook, { isLoading: deleting }] = useDeleteBookMutation();
@@ -38,27 +38,42 @@ export default function BooksPage() {
 
   const handleCreate = async (v: BookFormValues): Promise<{ success: boolean; message: string }> => {
     try {
-      if (v.copies === 0) v.available = false
-      await addBook(v).unwrap()
-      return { success: true, message: "Book created successfully" }
+      if (v.copies === 0) v.available = false;
+      await addBook(v).unwrap();
+      
+      // Close dialog and reset state
+      setOpenDialog(false);
+      setEditBook(null);
+      refetch();
+      
+      return { success: true, message: "Book created successfully" };
     } catch (err: any) {
-      return { success: false, message: err?.data?.message || "Failed to create book" }
+      return { success: false, message: err?.data?.message || "Failed to create book" };
     }
-  }
+  };
 
   const handleUpdate = async (v: BookFormValues): Promise<{ success: boolean; message: string }> => {
-    if (!editBook) return { success: false, message: "No book selected" }
+    if (!editBook) return { success: false, message: "No book selected" };
     try {
-      if (v.copies === 0) v.available = false
+      if (v.copies === 0) v.available = false;
       await updateBook({ id: editBook._id, data: v }).unwrap();
-      return { success: true, message: "Book updated successfully" }
+      
+      // Close dialog and reset state
+      setOpenDialog(false);
+      setEditBook(null);
+      refetch();
+      
+      return { success: true, message: "Book updated successfully" };
     } catch (err: any) {
-      return { success: false, message: err?.data?.message || "Failed to update book" }
+      return { success: false, message: err?.data?.message || "Failed to update book" };
     }
-  }
+  };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Delete this book?')) await deleteBook(id).unwrap();
+    if (confirm('Delete this book?')) {
+      await deleteBook(id).unwrap();
+      refetch();
+    }
   };
 
   const handleEditClick = (book: Book) => {
@@ -66,8 +81,13 @@ export default function BooksPage() {
     setOpenDialog(true);
   };
 
+  const handleAddClick = () => {
+    setEditBook(null);
+    setOpenDialog(true);
+  };
+
   return (
-    <div className="grid gap-6 mt-6  mb-8 max-w-7xl mx-auto">
+    <div className="grid gap-6 mt-6 mb-8 max-w-7xl mx-auto">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Books</CardTitle>
@@ -91,7 +111,7 @@ export default function BooksPage() {
             {/* Add Book Dialog */}
             <Dialog open={openDialog} onOpenChange={setOpenDialog}>
               <DialogTrigger asChild>
-                <Button onClick={() => { setEditBook(null); setOpenDialog(true); }}>
+                <Button onClick={handleAddClick}>
                   Add Book
                 </Button>
               </DialogTrigger>
@@ -151,31 +171,46 @@ export default function BooksPage() {
                     </Button>
 
                     {/* Borrow Dialog */}
-                    <Dialog
-                      open={borrowBookId === b._id}
-                      onOpenChange={(open) => setBorrowBookId(open ? b._id : null)}
-                    >
-                      <DialogTrigger asChild>
-                        <Button size="sm">
-                          Borrow
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[400px]">
-                        <DialogHeader>
-                          <DialogTitle>Borrow Book</DialogTitle>
-                        </DialogHeader>
-                        <BorrowBookForm bookId={b._id} maxQuantity={b.copies} />
-                      </DialogContent>
-                    </Dialog>
+                    {b.copies > 0 ? (
+                      <Dialog
+                        open={borrowBookId === b._id}
+                        onOpenChange={(open) => {
+                          setBorrowBookId(open ? b._id : null);
+                          if (!open) {
+                            // Refresh when dialog closes
+                            refetch();
+                          }
+                        }}
+                      >
+                        <DialogTrigger asChild>
+                          <Button size="sm">Borrow</Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[400px]">
+                          <DialogHeader>
+                            <DialogTitle>Borrow: {b.title}</DialogTitle>
+                          </DialogHeader>
+                          <BorrowBookForm 
+                            bookId={b._id} 
+                            maxQuantity={b.copies}
+                            onSuccess={() => {
+                              setBorrowBookId(null);
+                              refetch();
+                            }}
+                          />
+                        </DialogContent>
+                      </Dialog>
+                    ) : (
+                      <Button size="sm" variant="outline" disabled>
+                        Unavailable
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
-
           </Table>
         </CardContent>
       </Card>
     </div>
-
   );
 }
